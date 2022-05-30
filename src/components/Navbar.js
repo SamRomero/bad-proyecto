@@ -40,48 +40,49 @@ function Navbar() {
           <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
         </div>
         <ul className={click ? 'nav-menu active' : 'nav-menu'}>
+          
           <li className='nav-item'>
             <Link to='/' className='nav-links' onClick={closeMobileMenu}>
-              Home
+              Inicio
             </Link>
           </li>
+
           <li className='nav-item'>
-            <Link to='/' className='nav-links' onClick={closeMobileMenu}>
+            <Link to='/users' className='nav-links' onClick={closeMobileMenu}>
               Usuario
             </Link>
           </li>
-          <li
-            className='nav-item'
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-          >
-            <Link
-              to='/services'
-              className='nav-links'
-              onClick={closeMobileMenu}
-            >
-              Pacientes <i className='fas fa-caret-down' />
+
+          <li className='nav-item'>
+            <Link to='/patients' className='nav-links' onClick={closeMobileMenu}>
+              Pacientes
             </Link>
-            {dropdown && <Dropdown />}
           </li>
+
           <li className='nav-item'>
             <Link
-              to='/products'
+              to='/clinics'
               className='nav-links'
               onClick={closeMobileMenu}
             >
               Clinicas
             </Link>
           </li>
-          <li className='nav-item'>
+
+          <li className='nav-item'
+              onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave}
+              >
             <Link
-              to='/contact-us'
+              to='/exams'
               className='nav-links'
               onClick={closeMobileMenu}
             >
-              Exámenes
+              Exámenes <i className='fas fa-caret-down' />
             </Link>
+            {dropdown && <Dropdown />}
           </li>
+
           <li className='nav-item'>
             <Link
               to='/contact-us'
@@ -97,7 +98,7 @@ function Navbar() {
               className='nav-links-mobile'
               onClick={closeMobileMenu}
             >
-              Sign Up
+              Salir
             </Link>
             
           </li>

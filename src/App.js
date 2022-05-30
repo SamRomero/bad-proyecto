@@ -6,15 +6,15 @@ import React from 'react';
 import Navbar from './components/Navbar';
 import NavbarLogout from './components/NavbarLogout';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Services from './components/pages/Services';
-import Products from './components/pages/Products';
+import Clinics from './components/pages/Clinics';
+import Patients from './components/pages/Patients';
+import Home from './components/pages/Home';
+import Users from './components/pages/Users';
+import Exams from './components/pages/Exams';
 import ContactUs from './components/pages/ContactUs';
 import SignUp from './components/pages/SignUp';
-import Marketing from './components/pages/Marketing';
-import Consulting from './components/pages/Consulting';
-import Home from './components/pages/Home';
 
-import {useAuth0} from '@auth0/auth0-react'
+import {useAuth0, User} from '@auth0/auth0-react'
 
 function App() {
 
@@ -30,12 +30,12 @@ function App() {
           <Navbar/>
           <Routes>
             <Route path='/' exact element={<Home/>} />
-            <Route path='/services' element={<Services/>} />
-            <Route path='/products' element={<Products/>} />
+            <Route path='/users' element={<Users/>} />
+            <Route path='/patients' element={<Patients/>} />
             <Route path='/contact-us' element={<ContactUs/>} />
             <Route path='/sign-up' element={<SignUp/>} />
-            <Route path='/marketing' element={<Marketing/>} />
-            <Route path='/consulting' element={<Consulting/>} />
+            <Route path='/clinics' element={<Clinics/>} />
+            <Route path='/exams' element={<Exams/>} />
           </Routes> 
         </Router>
         :

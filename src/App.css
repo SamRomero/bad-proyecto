@@ -6,12 +6,12 @@
 }
 
 .home,
-.services,
-.products,
+.users,
+.patients,
 .contact-us,
 .sign-up,
-.marketing,
-.consulting {
+.clinics,
+.exams {
   display: flex;
   height: 90vh;
   align-items: center;
@@ -28,7 +28,7 @@
   font-size: 100px;
 }
 
-.services {
+.users {
   background-image: url('./images/img-2.jpg');
   background-position: center;
   background-size: cover;
@@ -37,7 +37,7 @@
   font-size: 100px;
 }
 
-.products {
+.patients {
   background-image: url('./images/img-3.jpg');
   background-position: center;
   background-size: fill;
@@ -64,7 +64,7 @@
   font-size: 100px;
 }
 
-.marketing {
+.clinics {
   background-image: url('./images/img-6.jpg');
   background-position: center;
   background-size: cover;
@@ -73,7 +73,7 @@
   font-size: 100px;
 }
 
-.consulting {
+.exams {
   background-image: url('./images/img-5.jpg');
   background-position: bottom;
   background-size: cover;
