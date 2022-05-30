@@ -81,3 +81,12 @@
   color: #fff;
   font-size: 100px;
 }
+
+.parameters {
+  background-image: url('./images/img-4.jpg');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  color: #fff;
+  font-size: 100px;
+}
