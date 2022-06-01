@@ -7,9 +7,7 @@ const LogoutButton = () => {
     const {logout} = useAuth0 ()
     
   return (
-    <button className='btn' onClick={() => logout()}>
-        Logout
-    </button>
+    <button className='btn btn-secondary' onClick={() => logout()}>Salir</button>
   )
 }
 
