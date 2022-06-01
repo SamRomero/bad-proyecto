@@ -88,13 +88,13 @@ setClinicSeleccionado(elemento);
         <tbody>
           {data.map(elemento=>(
             <tr>
-              <td scope="row">{elemento.id}</td>
-              <td scope="row">{elemento.nombre}</td>
-              <td scope="row">{elemento.telefono}</td>
-              <td scope="row">{elemento.direccion}</td>
-              <td scope="row">{elemento.municipio}</td>
-              <td scope="row">{elemento.departamento}</td>
-              <td scope="row"><button className="btn btn-primary" onClick={()=>seleccionarClinic(elemento, 'Editar')}>Editar</button> {"   "} 
+              <td >{elemento.id}</td>
+              <td >{elemento.nombre}</td>
+              <td >{elemento.telefono}</td>
+              <td >{elemento.direccion}</td>
+              <td >{elemento.municipio}</td>
+              <td >{elemento.departamento}</td>
+              <td ><button className="btn btn-primary" onClick={()=>seleccionarClinic(elemento, 'Editar')}>Editar</button> {"   "} 
               <button className="btn btn-danger" onClick={()=>seleccionarClinic(elemento, 'Eliminar')}>Eliminar</button></td>
             </tr>
           ))
@@ -136,7 +136,7 @@ setClinicSeleccionado(elemento);
               className="form-control"
               type="text"
               name="telefono"
-              value={clinicSeleccionado && clinicSeleccionado.minutos}
+              value={clinicSeleccionado && clinicSeleccionado.telefono}
               onChange={handleChange}
             />
 
@@ -145,7 +145,7 @@ setClinicSeleccionado(elemento);
               className="form-control"
               type="text"
               name="direccion"
-              value={clinicSeleccionado && clinicSeleccionado.minutos}
+              value={clinicSeleccionado && clinicSeleccionado.direccion}
               onChange={handleChange}
             />
 
@@ -154,7 +154,7 @@ setClinicSeleccionado(elemento);
               className="form-control"
               type="text"
               name="municipio"
-              value={clinicSeleccionado && clinicSeleccionado.minutos}
+              value={clinicSeleccionado && clinicSeleccionado.municipio}
               onChange={handleChange}
             />
 
@@ -163,7 +163,7 @@ setClinicSeleccionado(elemento);
               className="form-control"
               type="text"
               name="departamento"
-              value={clinicSeleccionado && clinicSeleccionado.minutos}
+              value={clinicSeleccionado && clinicSeleccionado.departamento}
               onChange={handleChange}
             />
             <br />
@@ -234,7 +234,7 @@ setClinicSeleccionado(elemento);
               className="form-control"
               type="text"
               name="telefono"
-              value={clinicSeleccionado ? clinicSeleccionado.minutos: ''}
+              value={clinicSeleccionado ? clinicSeleccionado.telefono: ''}
               onChange={handleChange}
             />
 
@@ -243,7 +243,7 @@ setClinicSeleccionado(elemento);
               className="form-control"
               type="text"
               name="direccion"
-              value={clinicSeleccionado ? clinicSeleccionado.minutos: ''}
+              value={clinicSeleccionado ? clinicSeleccionado.direccion: ''}
               onChange={handleChange}
             />
 
@@ -252,7 +252,7 @@ setClinicSeleccionado(elemento);
               className="form-control"
               type="text"
               name="municipio"
-              value={clinicSeleccionado ? clinicSeleccionado.minutos: ''}
+              value={clinicSeleccionado ? clinicSeleccionado.municipio: ''}
               onChange={handleChange}
             />
 
@@ -261,7 +261,7 @@ setClinicSeleccionado(elemento);
               className="form-control"
               type="text"
               name="departamento"
-              value={clinicSeleccionado ? clinicSeleccionado.minutos: ''}
+              value={clinicSeleccionado ? clinicSeleccionado.departamento: ''}
               onChange={handleChange}
             />
             <br />

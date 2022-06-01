@@ -67,13 +67,13 @@ setExamSeleccionado(elemento);
   }
 
   return (
-    <div className="App">
+    <div class="table-responsive">
       <h2>Listado de Exámenes Disponibles</h2>
       <br />
     <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insertar</button>
     <br /><br />
-      <table className="table table-bordered">
-        <thead>
+    <table className="table table-hover">
+        <thead class="table-dark">
           <tr>
             <th>ID</th>
             <th>Nombre</th>
