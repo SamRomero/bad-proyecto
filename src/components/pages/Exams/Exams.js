@@ -70,7 +70,9 @@ setExamSeleccionado(elemento);
     <div class="table-responsive">
       <h2>Listado de Exámenes Disponibles</h2>
       <br />
-    <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insertar</button>
+      {"   "}<button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insertar</button>
+    {"   "}
+    <a class="btn btn-secondary" href="/area" role="button">Areas</a>
     <br /><br />
     <table className="table table-hover">
         <thead class="table-dark">
@@ -98,7 +100,7 @@ setExamSeleccionado(elemento);
       <Modal isOpen={modalEditar}>
         <ModalHeader>
           <div>
-            <h3>Editar País</h3>
+            <h3>Editar Registro</h3>
           </div>
         </ModalHeader>
         <ModalBody>

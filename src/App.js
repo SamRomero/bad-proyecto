@@ -14,6 +14,8 @@ import Exams from './components/pages/Exams/Exams';
 import ContactUs from './components/pages/ContactUs';
 import SignUp from './components/pages/SignUp';
 import Parameter from './components/pages/Parameters/Parameter';
+import Resultados from './components/pages/Resultados/Resultados';
+import Area from './components/pages/Area Clinica/Area';
 
 import {useAuth0, User} from '@auth0/auth0-react'
 
@@ -38,6 +40,9 @@ function App() {
             <Route path='/clinics' element={<Clinics/>} />
             <Route path='/exams' element={<Exams/>} />
             <Route path='/parameters' element={<Parameter/>} />
+            <Route path='/resultados' element={<Resultados/>} />
+            <Route path='/area' element={<Area/>} />
+            
           </Routes> 
         </Router>
         :
