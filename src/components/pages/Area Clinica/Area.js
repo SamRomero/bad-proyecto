@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import '../../../App.css';
+import './Area.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
 
@@ -66,7 +67,7 @@ export default function Area() {
       }
     
       return (
-        <div class="table-responsive">
+        <div class="Area">
           <h2>Listado de Áreas</h2>
           <br />
         <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insertar</button>

@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import '../../../App.css';
+import './Patients.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
 
@@ -72,7 +73,7 @@ setPatientSeleccionado(elemento);
   }
 
   return (
-    <div class="table-responsive">
+    <div class="Patients">
       <h2>Listado de Pacientes</h2>
       <br />
 
