@@ -60,41 +60,24 @@ function Navbar() {
           </li>
 
           <li className='nav-item'>
-            <Link
-              to='/clinics'
-              className='nav-links'
-              onClick={closeMobileMenu}
-            >
+            <Link to='/clinics' className='nav-links' onClick={closeMobileMenu}>
               Clinicas
             </Link>
           </li>
 
           <li className='nav-item'
-              onMouseEnter={onMouseEnter}
-              onMouseLeave={onMouseLeave}
+/*               onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave} */
               >
-            <Link
-              to='/exams'
-              className='nav-links'
-              onClick={closeMobileMenu}
+            <Link to='/exams-order' className='nav-links' onClick={closeMobileMenu}
             >
-              Exámenes <i className='fas fa-caret-down' />
+              Orden de Exámenes <i className='fas' />
             </Link>
-            {dropdown && <Dropdown />}
-          </li>
-
-          <li className='nav-item'>
+            {/* {dropdown && <Dropdown />} */}
+          </li>       
+          
+          <li> 
             <Link
-              to='/contact-us'
-              className='nav-links'
-              onClick={closeMobileMenu}
-            >
-              Contáctanos
-            </Link>
-          </li>
-          
-          
-          <li> <Link
               to='/sign-up'
               className='nav-links-mobile'
               onClick={closeMobileMenu}
