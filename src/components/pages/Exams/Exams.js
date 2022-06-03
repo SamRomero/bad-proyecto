@@ -1,27 +1,49 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import '../../../App.css';
 import './Exams.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
 
 export default function Exams() {
-  const dataExams = [
-    { id: 1, },
-    { id: 2,  },
-    { id: 3,  },
-    { id: 4, },
-  ];
-
-  const [data, setData] = useState(dataExams);
+  function getData(){
+    let baseurl = process.env.REACT_APP_URL_BASE //url base, var de entrada en .env debe apuntar a localhosto 7008
+    const url = baseurl+"/api/TipoExamen" //url de donde se consume, dependiendo de los cruds
+    const params = { //
+      method: 'GET', //se usa tal cual, solo se modifica el token, la cadena, dependiendo del usuario logueado.
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN
+      }, 
+    }
+    fetch(url, params).then(res => res.json()) //copiar y pegar, mapeo 
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      const dataExams =[]
+      for (let index = 0; index < response.length; index++) {
+        dataExams[index] = { //arreglo de data clinics. todos los datos que devuelve clinica
+          id : response[index].id,  // react -> api
+          nombre : response[index].nombreTipoExamen,
+          area : response[index].areaClinicaId,
+          paramametros : response[index].parametros
+        }
+      }
+      console.log(response) //quitar
+      setData(dataExams)
+    });
+  }
+  const [data, setData] = useState([]);
   const [modalEditar, setModalEditar] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
   const [modalInsertar, setModalInsertar] = useState(false);
 
   const [examSeleccionado, setExamSeleccionado] = useState({
     id: '',
-    nombre: '',
-    area: ''
+    nombre: ''
   });
+
+  useEffect(()=>{ //copy and page
+    getData()
+  }, []);
 
   const seleccionarExam=(elemento, caso)=>{
 setExamSeleccionado(elemento);
@@ -36,21 +58,32 @@ setExamSeleccionado(elemento);
     }));
   }
 
-  const editar=()=>{
-    var dataNueva=data;
-    dataNueva.map(exam=>{
-      if(exam.id===examSeleccionado.id){
-        exam.area=examSeleccionado.area;
-        exam.nombre=examSeleccionado.nombre;
-      }
-    });
-    setData(dataNueva);
-    setModalEditar(false);
-  }
 
-  const eliminar =()=>{
-    setData(data.filter(exam=>exam.id!==examSeleccionado.id));
-    setModalEliminar(false);
+  //EDITAR
+  const editar =()=>{
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/TipoExamen/"+examSeleccionado.id //no tocar nada, mas que url y el id
+    const params = {
+      method: 'PUT',
+      headers:{
+        'accept': '*/*',
+        'content-type':'application/json', //esto es pa editar.
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //modificar key
+      }, 
+      body:JSON.stringify({ //depende de los campos.
+        id : examSeleccionado.id,
+        nombreTipoExamen : examSeleccionado.nombre,
+        areaClinicaId : parseInt(examSeleccionado.area) ,
+        paramametros : examSeleccionado.parametros
+      })
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      //console.log(response)
+      getData()
+      setModalEditar(false)
+    });
   }
 
   const abrirModalInsertar=()=>{
@@ -58,13 +91,30 @@ setExamSeleccionado(elemento);
     setModalInsertar(true);
   }
 
+  //insertar
   const insertar =()=>{
-    var valorInsertar=examSeleccionado;
-    valorInsertar.id=data[data.length-1].id+1;
-    var dataNueva = data;
-    dataNueva.push(valorInsertar);
-    setData(dataNueva);
-    setModalInsertar(false);
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/TipoExamen" //modificar url
+    const params = {
+      method: 'POST', //metodo post
+      headers:{
+        'accept': '*/*',
+        'content-type':'application/json', //json
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //modificar key
+      }, 
+      body:JSON.stringify({ //api -> front
+        nombreTipoExamen : examSeleccionado.nombre,
+        areaClinicaId : parseInt(examSeleccionado.area) ,
+        paramametros : examSeleccionado.parametros
+      })
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      console.log(response)
+      getData()
+      setModalInsertar(false)
+    });
   }
 
   return (
@@ -81,6 +131,7 @@ setExamSeleccionado(elemento);
             <th>ID</th>
             <th>Nombre</th>
             <th>Área</th>
+            <th>Parametros</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -90,8 +141,8 @@ setExamSeleccionado(elemento);
               <td>{elemento.id}</td>
               <td>{elemento.nombre}</td>
               <td>{elemento.area}</td>
-              <td><button className="btn btn-primary" onClick={()=>seleccionarExam(elemento, 'Editar')}>Editar</button> {"   "} 
-              <button className="btn btn-danger" onClick={()=>seleccionarExam(elemento, 'Eliminar')}>Eliminar</button></td>
+              <td>{elemento.paramametros}</td>
+              <td><button className="btn btn-primary" onClick={()=>seleccionarExam(elemento, 'Editar')}>Editar</button></td>
             </tr>
           ))
           }
@@ -135,6 +186,17 @@ setExamSeleccionado(elemento);
               onChange={handleChange}
             />
             <br />
+            
+
+            <label>Parametros</label>
+            <input
+              className="form-control"
+              type="text"
+              name="parametros"
+              value={examSeleccionado && examSeleccionado.paramametros}
+              onChange={handleChange}
+            />
+            <br />
           </div>
         </ModalBody>
 
@@ -153,24 +215,6 @@ setExamSeleccionado(elemento);
       </Modal>
 
 
-      <Modal isOpen={modalEliminar}>
-        <ModalBody>
-          Estás Seguro que deseas eliminar el registro {examSeleccionado && examSeleccionado.nombre}
-        </ModalBody>
-        <ModalFooter>
-          <button className="btn btn-danger" onClick={()=>eliminar()}>
-            Sí
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={()=>setModalEliminar(false)}
-          >
-            No
-          </button>
-        </ModalFooter>
-      </Modal>
-
-
         <Modal isOpen={modalInsertar}>
         <ModalHeader>
           <div>
@@ -179,15 +223,6 @@ setExamSeleccionado(elemento);
         </ModalHeader>
         <ModalBody>
           <div className="form-group">
-            <label>ID</label>
-            <input
-              className="form-control"
-              readOnly
-              type="text"
-              name="id"
-              value={data[data.length-1].id+1}
-            />
-            <br />
 
             <label>Nombre del Examen</label>
             <input
@@ -205,6 +240,16 @@ setExamSeleccionado(elemento);
               type="text"
               name="area"
               value={examSeleccionado ? examSeleccionado.area: ''}
+              onChange={handleChange}
+            />
+            <br />
+
+            <label>Parametros</label>
+            <input
+              className="form-control"
+              type="text"
+              name="parametros"
+              value={examSeleccionado && examSeleccionado.paramametros}
               onChange={handleChange}
             />
             <br />
