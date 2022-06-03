@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import '../../../App.css';
 import './Users.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -6,28 +6,57 @@ import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
 
 export default function Users() {
 
-  const dataUsers = [
-    { id: 1,},
-    { id: 2,},
-    { id: 3,},
-    { id: 4,},
-    { id: 5,}
-  ];
+  function getData(){
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/User/estado?estado=true"
+    const params = {
+      method: 'GET',
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+process.env.REACT_APP_TOKEN
+      }, 
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
 
-  const [data, setData] = useState(dataUsers);
+      const dataUsers =[]
+      
+      for (let index = 0; index < response.length; index++) {
+        dataUsers[index] = {
+          id : response[index].id, 
+          user : response[index].userName, 
+          nombre : response[index].nombreUsuario, 
+          apellido : response[index].apellidoUsuario, 
+          dui : response[index].usuarioDui,
+          clinica : response[index].clinicaId
+        }
+      }
+      console.log(dataUsers)
+      setData(dataUsers)
+    });
+  }
+
+  const [data, setData] = useState([]);
   const [modalEditar, setModalEditar] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
   const [modalInsertar, setModalInsertar] = useState(false);
 
   const [userSeleccionado, setUserSeleccionado] = useState({
     id: '',
-    rol: '',
     user: '',
+    password: '',
+    email: '',
+    jvpm: '',
     nombre: '',
     apellido: '',
     dui: '',
     clinica: '',
   });
+
+  useEffect(()=>{
+    getData()
+  }, []);
 
   const seleccionarUser=(elemento, caso)=>{
 setUserSeleccionado(elemento);
@@ -42,25 +71,29 @@ setUserSeleccionado(elemento);
     }));
   }
 
-  const editar=()=>{
-    var dataNueva=data;
-    dataNueva.map(user=>{
-      if(user.id===userSeleccionado.id){
-        user.rol=userSeleccionado.rol;
-        user.user=userSeleccionado.user;
-        user.nombre=userSeleccionado.nombre;
-        user.apellido=userSeleccionado.apellido;
-        user.dui=userSeleccionado.dui;
-        user.clinica=userSeleccionado.clinica;
-      }
-    });
-    setData(dataNueva);
-    setModalEditar(false);
-  }
-
   const eliminar =()=>{
-    setData(data.filter(user=>user.id!==userSeleccionado.id));
-    setModalEliminar(false);
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/User/"+userSeleccionado.user
+    const params = {
+      method: 'DELETE',
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+process.env.REACT_APP_TOKEN
+      } 
+    }
+    fetch(url, params).then(res => {
+      if(!res.ok){
+        const error = (data && data.message) || res.status;
+        return Promise.reject(error)
+      }
+      alert("Usuario eliminada con exito")
+      getData()
+      setModalEliminar(false)
+    })
+    .catch(error =>{ 
+      alert("El usuario no es candidata a eliminacion")
+      setModalEliminar(false)
+    });
   }
 
   const abrirModalInsertar=()=>{
@@ -69,12 +102,34 @@ setUserSeleccionado(elemento);
   }
 
   const insertar =()=>{
-    var valorInsertar=userSeleccionado;
-    valorInsertar.id=data[data.length-1].id+1;
-    var dataNueva = data;
-    dataNueva.push(valorInsertar);
-    setData(dataNueva);
-    setModalInsertar(false);
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/User"
+    const params = {
+      method: 'POST',
+      headers:{
+        'accept': '*/*',
+        'content-type':'application/json',
+        'Authorization': 'Bearer '+process.env.REACT_APP_TOKEN
+      }, 
+      body:JSON.stringify({
+        id : userSeleccionado.id,
+        userName : userSeleccionado.user,
+        password :userSeleccionado.password,
+        email : userSeleccionado.email,
+        jvpm : parseInt(userSeleccionado.jvpm),
+        nombreUsuario : userSeleccionado.nombre,
+        apellidoUsuario :userSeleccionado.apellido,
+        usuarioDui : userSeleccionado.dui,
+        clinicaId : parseInt(userSeleccionado.clinica),
+      })
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      console.log(response)
+      getData()
+      setModalInsertar(false)
+    });
   }
 
   return (
@@ -87,7 +142,6 @@ setUserSeleccionado(elemento);
         <thead class="table-dark">
           <tr>
             <th scope="col">Código</th>
-            <th scope="col">Rol</th>
             <th scope="col">Usuario</th>
             <th scope="col">Nombre</th>
             <th scope="col">Apellido</th>
@@ -99,12 +153,11 @@ setUserSeleccionado(elemento);
           {data.map(elemento=>(
             <tr>
               <td>{elemento.id}</td>
-              <td>{elemento.rol}</td>
               <td>{elemento.user}</td>
               <td>{elemento.nombre}</td>
               <td>{elemento.apellido}</td>
               <td>{elemento.dui}</td>
-              <td><button className="btn btn-primary" onClick={()=>seleccionarUser(elemento, 'Editar')}>Editar</button> {"   "} 
+              <td>{"   "} 
               <button className="btn btn-danger"onClick={()=>seleccionarUser(elemento, 'Eliminar')}>Eliminar</button></td>
             </tr>
           ))
@@ -120,22 +173,12 @@ setUserSeleccionado(elemento);
         </ModalHeader>
         <ModalBody>
           <div className="form-group">
-            <label>ID</label>
+            <label>Nombre de Empleado</label>
             <input
               className="form-control"
-              readOnly
               type="text"
               name="id"
-              value={userSeleccionado && userSeleccionado.id}
-            />
-            <br />
-
-            <label>Rol</label>
-            <input
-              className="form-control"
-              type="text"
-              name="rol"
-              value={userSeleccionado ? userSeleccionado.rol: ''}
+              value={userSeleccionado ? userSeleccionado.id: ''}
               onChange={handleChange}
             />
             <br />
@@ -146,6 +189,36 @@ setUserSeleccionado(elemento);
               type="text"
               name="user"
               value={userSeleccionado ? userSeleccionado.user: ''}
+              onChange={handleChange}
+            />
+            <br />
+
+            <label>Password</label>
+            <input
+              className="form-control"
+              type="text"
+              name="password"
+              value={userSeleccionado ? userSeleccionado.password: ''}
+              onChange={handleChange}
+            />
+            <br />
+
+            <label>Email</label>
+            <input
+              className="form-control"
+              type="text"
+              name="email"
+              value={userSeleccionado ? userSeleccionado.email: ''}
+              onChange={handleChange}
+            />
+            <br />
+
+            <label>JVPM</label>
+            <input
+              className="form-control"
+              type="text"
+              name="jvpm"
+              value={userSeleccionado ? userSeleccionado.jvpm: ''}
               onChange={handleChange}
             />
             <br />
@@ -192,7 +265,7 @@ setUserSeleccionado(elemento);
           </div>
         </ModalBody>
         <ModalFooter>
-          <button className="btn btn-primary" onClick={()=>editar()}>
+          <button className="btn btn-primary">
             Actualizar
           </button>
           <button
@@ -231,22 +304,12 @@ setUserSeleccionado(elemento);
         </ModalHeader>
         <ModalBody>
           <div className="form-group">
-            <label>ID</label>
+            <label>Nombre de Empleado</label>
             <input
               className="form-control"
-              readOnly
               type="text"
               name="id"
-              value={data[data.length-1].id+1}
-            />
-            <br />
-
-            <label>Rol</label>
-            <input
-              className="form-control"
-              type="text"
-              name="rol"
-              value={userSeleccionado ? userSeleccionado.rol: ''}
+              value={userSeleccionado ? userSeleccionado.id: ''}
               onChange={handleChange}
             />
             <br />
@@ -257,6 +320,36 @@ setUserSeleccionado(elemento);
               type="text"
               name="user"
               value={userSeleccionado ? userSeleccionado.user: ''}
+              onChange={handleChange}
+            />
+            <br />
+
+            <label>Password</label>
+            <input
+              className="form-control"
+              type="text"
+              name="password"
+              value={userSeleccionado ? userSeleccionado.password: ''}
+              onChange={handleChange}
+            />
+            <br />
+
+            <label>Email</label>
+            <input
+              className="form-control"
+              type="text"
+              name="email"
+              value={userSeleccionado ? userSeleccionado.email: ''}
+              onChange={handleChange}
+            />
+            <br />
+
+            <label>JVPM</label>
+            <input
+              className="form-control"
+              type="text"
+              name="jvpm"
+              value={userSeleccionado ? userSeleccionado.jvpm: ''}
               onChange={handleChange}
             />
             <br />
@@ -299,6 +392,7 @@ setUserSeleccionado(elemento);
               value={userSeleccionado ? userSeleccionado.clinica: ''}
               onChange={handleChange}
             />
+            <br />
           </div>
         </ModalBody>
         <ModalFooter>
