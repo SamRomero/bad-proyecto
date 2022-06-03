@@ -1,17 +1,39 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react'; //useEffect paa la tablas
 import '../../../App.css';
-import './Clinics.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './Clinics.css';
 import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
+import { Alert } from 'bootstrap';
 
 export default function Clinics() {
-  const dataClinics = [
-    { id: 1,  },
-    { id: 2,  },
-    { id: 3, },
-  ];
-
-  const [data, setData] = useState(dataClinics);
+  function getData(){
+    let baseurl = process.env.REACT_APP_URL_BASE //url base, var de entrada en .env debe apuntar a localhosto 7008
+    const url = baseurl+"/api/Clinicas" //url de donde se consume, dependiendo de los cruds
+    const params = { //
+      method: 'GET', //se usa tal cual, solo se modifica el token, la cadena, dependiendo del usuario logueado.
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN
+      }, 
+    }
+    fetch(url, params).then(res => res.json()) //copiar y pegar, mapeo 
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      const dataClinics =[]
+      for (let index = 0; index < response.length; index++) {
+        dataClinics[index] = { //arreglo de data clinics. todos los datos que devuelve clinica
+          id : response[index].id,  // react -> api
+          nombre : response[index].clinicaNombre, 
+          telefono : response[index].clinicaTelefono, 
+          direccion : response[index].clinicaDireccion, 
+          municipio : response[index].municipioId 
+        }
+      }
+      console.log(dataClinics) //quitar
+      setData(dataClinics)
+    });
+  }
+  const [data, setData] = useState([]);
   const [modalEditar, setModalEditar] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
   const [modalInsertar, setModalInsertar] = useState(false);
@@ -24,6 +46,10 @@ export default function Clinics() {
     municipio: '',
     departamento: ''
   });
+
+  useEffect(()=>{ //copy and page
+    getData()
+  }, []);
 
   const seleccionarClinic=(elemento, caso)=>{
 setClinicSeleccionado(elemento);
@@ -38,23 +64,58 @@ setClinicSeleccionado(elemento);
     }));
   }
 
-  const editar=()=>{
-    var dataNueva=data;
-    dataNueva.map(clinic=>{
-      if(clinic.id===clinicSeleccionado.id){
-        clinic.telefono=clinicSeleccionado.telefono;
-        clinic.direccion=clinicSeleccionado.direccion;
-        clinic.municipio=clinicSeleccionado.municipio;
-        clinic.departamento=clinicSeleccionado.departamento;
+  //
+  const eliminar=()=>{
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/Clinicas/"+clinicSeleccionado.id //cambiar url, concatenar id
+    const params = {
+      method: 'DELETE', //metodo delete
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //cambiar token, si tira 401, significa que el token se venció.
+      } 
+    }
+    fetch(url, params).then(res => {
+      if(!res.ok){
+        const error = (data && data.message) || res.status;
+        return Promise.reject(error)
       }
+      alert("clinica eliminada con exito")
+      getData()
+      setModalEliminar(false)
+    })
+    .catch(error =>{ 
+      alert("la clinica no es candidata a eliminacion")
+      setModalEliminar(false)
     });
-    setData(dataNueva);
-    setModalEditar(false);
   }
 
-  const eliminar =()=>{
-    setData(data.filter(clinic=>clinic.id!==clinicSeleccionado.id));
-    setModalEliminar(false);
+  //EDITAR
+  const editar =()=>{
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/Clinicas/"+clinicSeleccionado.id //no tocar nada, mas que url y el id
+    const params = {
+      method: 'PUT',
+      headers:{
+        'accept': '*/*',
+        'content-type':'application/json', //esto es pa editar.
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //modificar key
+      }, 
+      body:JSON.stringify({ //depende de los campos.
+        id : clinicSeleccionado.id,
+        clinicaNombre : clinicSeleccionado.nombre, //api -> front
+        clinicaTelefono : clinicSeleccionado.telefono,
+        clinicaDireccion :clinicSeleccionado.direccion,
+        municipioId : parseInt(clinicSeleccionado.municipio) //todos los id hay que parsearlos a enteros.
+      })
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      //console.log(response)
+      getData()
+      setModalEditar(false)
+    });
   }
 
   const abrirModalInsertar=()=>{
@@ -62,13 +123,31 @@ setClinicSeleccionado(elemento);
     setModalInsertar(true);
   }
 
+  //insertar
   const insertar =()=>{
-    var valorInsertar=clinicSeleccionado;
-    valorInsertar.id=data[data.length-1].id+1;
-    var dataNueva = data;
-    dataNueva.push(valorInsertar);
-    setData(dataNueva);
-    setModalInsertar(false);
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/Clinicas" //modificar url
+    const params = {
+      method: 'POST', //metodo post
+      headers:{
+        'accept': '*/*',
+        'content-type':'application/json', //json
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //modificar key
+      }, 
+      body:JSON.stringify({ //api -> front
+        clinicaNombre : clinicSeleccionado.nombre,
+        clinicaTelefono : clinicSeleccionado.telefono,
+        clinicaDireccion :clinicSeleccionado.direccion,
+        municipioId : parseInt(clinicSeleccionado.municipio) //enteros parsearlos
+      })
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      console.log(response)
+      getData()
+      setModalInsertar(false)
+    });
   }
 
   return (
@@ -87,7 +166,6 @@ setClinicSeleccionado(elemento);
             <th scope="col">Telefono</th>
             <th scope="col">Direccion</th>
             <th scope="col">Municipio</th>
-            <th scope="col">Departamento</th>
             <th scope="col">Acciones</th>
           </tr>
         </thead>
@@ -99,7 +177,6 @@ setClinicSeleccionado(elemento);
               <td >{elemento.telefono}</td>
               <td >{elemento.direccion}</td>
               <td >{elemento.municipio}</td>
-              <td >{elemento.departamento}</td>
               <td ><button className="btn btn-primary" onClick={()=>seleccionarClinic(elemento, 'Editar')}>Editar</button> {"   "} 
               <button className="btn btn-danger" onClick={()=>seleccionarClinic(elemento, 'Eliminar')}>Eliminar</button></td>
             </tr>
@@ -163,15 +240,6 @@ setClinicSeleccionado(elemento);
               value={clinicSeleccionado && clinicSeleccionado.municipio}
               onChange={handleChange}
             />
-
-            <label>Departamento</label>
-            <input
-              className="form-control"
-              type="text"
-              name="departamento"
-              value={clinicSeleccionado && clinicSeleccionado.departamento}
-              onChange={handleChange}
-            />
             <br />
           </div>
         </ModalBody>
@@ -215,15 +283,6 @@ setClinicSeleccionado(elemento);
         </ModalHeader>
         <ModalBody>
           <div className="form-group">
-            <label>ID</label>
-            <input
-              className="form-control"
-              readOnly
-              type="text"
-              name="id"
-              value={data[data.length-1].id+1}
-            />
-            <br />
 
             <label>Nombre de Clínica</label>
             <input
@@ -259,15 +318,6 @@ setClinicSeleccionado(elemento);
               type="text"
               name="municipio"
               value={clinicSeleccionado ? clinicSeleccionado.municipio: ''}
-              onChange={handleChange}
-            />
-
-            <label>Departamento</label>
-            <input
-              className="form-control"
-              type="text"
-              name="departamento"
-              value={clinicSeleccionado ? clinicSeleccionado.departamento: ''}
               onChange={handleChange}
             />
             <br />
