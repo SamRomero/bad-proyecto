@@ -74,7 +74,13 @@ function Navbar() {
               Orden de Exámenes <i className='fas' />
             </Link>
             {/* {dropdown && <Dropdown />} */}
-          </li>       
+          </li>     
+
+          <li className='nav-item'>
+            <Link to='/contact-us' className='nav-links' onClick={closeMobileMenu}>
+              Contácenos
+            </Link>
+          </li>  
           
           <li> 
             <Link
