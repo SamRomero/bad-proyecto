@@ -18,7 +18,10 @@ export default function Clinics() {
   const [clinicSeleccionado, setClinicSeleccionado] = useState({
     id: '',
     nombre: '',
-    minutos: ''
+    telefono: '',
+    direccion: '',
+    municipio: '',
+    departamento: ''
   });
 
   const seleccionarClinic=(elemento, caso)=>{
@@ -38,8 +41,10 @@ setClinicSeleccionado(elemento);
     var dataNueva=data;
     dataNueva.map(clinic=>{
       if(clinic.id===clinicSeleccionado.id){
-        clinic.minutos=clinicSeleccionado.minutos;
-        clinic.nombre=clinicSeleccionado.nombre;
+        clinic.telefono=clinicSeleccionado.telefono;
+        clinic.direccion=clinicSeleccionado.direccion;
+        clinic.municipio=clinicSeleccionado.municipio;
+        clinic.departamento=clinicSeleccionado.departamento;
       }
     });
     setData(dataNueva);

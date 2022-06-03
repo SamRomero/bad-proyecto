@@ -18,7 +18,10 @@ export default function Patients() {
   const [patientSeleccionado, setPatientSeleccionado] = useState({
     id: '',
     nombre: '',
-    minutos: ''
+    apellido: '',
+    telefono: '',
+    dui: '',
+    direccion: ''
   });
 
   const seleccionarPatient=(elemento, caso)=>{
@@ -38,8 +41,11 @@ setPatientSeleccionado(elemento);
     var dataNueva=data;
     dataNueva.map(patient=>{
       if(patient.id===patientSeleccionado.id){
-        patient.minutos=patientSeleccionado.minutos;
         patient.nombre=patientSeleccionado.nombre;
+        patient.apellido=patientSeleccionado.apellido;
+        patient.telefono=patientSeleccionado.telefono;
+        patient.dui=patientSeleccionado.dui;
+        patient.direccion=patientSeleccionado.direccion;
       }
     });
     setData(dataNueva);
@@ -136,7 +142,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="apellido"
-              value={patientSeleccionado && patientSeleccionado.nombre}
+              value={patientSeleccionado && patientSeleccionado.apellido}
               onChange={handleChange}
             />
             <br />
@@ -146,7 +152,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="dui"
-              value={patientSeleccionado && patientSeleccionado.nombre}
+              value={patientSeleccionado && patientSeleccionado.dui}
               onChange={handleChange}
             />
             <br />
@@ -156,7 +162,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="telefono"
-              value={patientSeleccionado && patientSeleccionado.minutos}
+              value={patientSeleccionado && patientSeleccionado.telefono}
               onChange={handleChange}
             />
             <br />
@@ -166,7 +172,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="direccion"
-              value={patientSeleccionado && patientSeleccionado.minutos}
+              value={patientSeleccionado && patientSeleccionado.direccion}
               onChange={handleChange}
             />
             <br />
@@ -176,7 +182,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="municipio"
-              value={patientSeleccionado && patientSeleccionado.minutos}
+              value={patientSeleccionado && patientSeleccionado.municipio}
               onChange={handleChange}
             />
             <br />
@@ -186,7 +192,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="departamento"
-              value={patientSeleccionado && patientSeleccionado.minutos}
+              value={patientSeleccionado && patientSeleccionado.departamento}
               onChange={handleChange}
             />
             <br />
@@ -196,7 +202,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="correo"
-              value={patientSeleccionado && patientSeleccionado.minutos}
+              value={patientSeleccionado && patientSeleccionado.correo}
               onChange={handleChange}
             />
             <br />
@@ -206,7 +212,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="fechaNaci"
-              value={patientSeleccionado && patientSeleccionado.minutos}
+              value={patientSeleccionado && patientSeleccionado.fechaNaci}
               onChange={handleChange}
             />
             <br />
@@ -216,7 +222,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="altura"
-              value={patientSeleccionado && patientSeleccionado.minutos}
+              value={patientSeleccionado && patientSeleccionado.altura}
               onChange={handleChange}
             />
             <br />
@@ -226,7 +232,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="peso"
-              value={patientSeleccionado && patientSeleccionado.minutos}
+              value={patientSeleccionado && patientSeleccionado.peso}
               onChange={handleChange}
             />
             <br />
@@ -236,7 +242,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="tEmergencia"
-              value={patientSeleccionado && patientSeleccionado.minutos}
+              value={patientSeleccionado && patientSeleccionado.tEmergencia}
               onChange={handleChange}
             />
             <br />
@@ -309,7 +315,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="apellido"
-              value={patientSeleccionado ? patientSeleccionado.nombre: ''}
+              value={patientSeleccionado ? patientSeleccionado.apellido: ''}
               onChange={handleChange}
             />
             <br />
@@ -319,7 +325,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="dui"
-              value={patientSeleccionado ? patientSeleccionado.nombre: ''}
+              value={patientSeleccionado ? patientSeleccionado.dui: ''}
               onChange={handleChange}
             />
             <br />
@@ -329,7 +335,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="telefono"
-              value={patientSeleccionado ? patientSeleccionado.minutos: ''}
+              value={patientSeleccionado ? patientSeleccionado.telefono: ''}
               onChange={handleChange}
             />
             <br />
@@ -339,7 +345,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="direccion"
-              value={patientSeleccionado ? patientSeleccionado.minutos: ''}
+              value={patientSeleccionado ? patientSeleccionado.direccion: ''}
               onChange={handleChange}
             />
             <br />
@@ -349,7 +355,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="municipio"
-              value={patientSeleccionado ? patientSeleccionado.minutos: ''}
+              value={patientSeleccionado ? patientSeleccionado.municipio: ''}
               onChange={handleChange}
             />
             <br />
@@ -359,7 +365,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="departamento"
-              value={patientSeleccionado ? patientSeleccionado.minutos: ''}
+              value={patientSeleccionado ? patientSeleccionado.departamento: ''}
               onChange={handleChange}
             />
             <br />
@@ -369,7 +375,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="correo"
-              value={patientSeleccionado ? patientSeleccionado.minutos: ''}
+              value={patientSeleccionado ? patientSeleccionado.correo: ''}
               onChange={handleChange}
             />
             <br />
@@ -379,7 +385,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="fechaNaci"
-              value={patientSeleccionado ? patientSeleccionado.minutos: ''}
+              value={patientSeleccionado ? patientSeleccionado.fechaNaci: ''}
               onChange={handleChange}
             />
             <br />
@@ -389,7 +395,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="altura"
-              value={patientSeleccionado ? patientSeleccionado.minutos: ''}
+              value={patientSeleccionado ? patientSeleccionado.altura: ''}
               onChange={handleChange}
             />
             <br />
@@ -399,7 +405,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="peso"
-              value={patientSeleccionado ? patientSeleccionado.minutos: ''}
+              value={patientSeleccionado ? patientSeleccionado.peso: ''}
               onChange={handleChange}
             />
             <br />
@@ -409,7 +415,7 @@ setPatientSeleccionado(elemento);
               className="form-control"
               type="text"
               name="tEmergencia"
-              value={patientSeleccionado ? patientSeleccionado.minutos: ''}
+              value={patientSeleccionado ? patientSeleccionado.tEmergencia: ''}
               onChange={handleChange}
             />
             <br />

@@ -19,8 +19,7 @@ export default function Area() {
     
       const [areaSeleccionado, setAreaeleccionado] = useState({
         id: '',
-        nombre: '',
-        area: ''
+        nombre: ''
       });
     
       const seleccionarArea=(elemento, caso)=>{
