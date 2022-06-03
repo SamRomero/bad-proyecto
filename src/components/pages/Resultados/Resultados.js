@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import '../../../App.css';
+import './Resultados.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
 
@@ -69,7 +70,7 @@ export default function Resultados() {
       }
     
       return (
-        <div class="table-responsive">
+        <div class="Resultados">
           <h2>Resultados de Examenes</h2>
           <br />
         <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insertar</button>

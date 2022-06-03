@@ -28,62 +28,20 @@
   font-size: 100px;
 }
 
-.users {
-  background-image: url('./images/img-2.jpg');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  color: #fff;
-  font-size: 100px;
-}
 
-.patients {
-  background-image: url('./images/img-3.jpg');
-  background-position: center;
-  background-size: fill;
-  background-repeat: no-repeat;
-  color: #fff;
-  font-size: 100px;
-}
 
 .contact-us {
-  background-image: url('./images/img-4.jpg');
+  background-image: url('./images/IMG11.jpg');
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  color: #fff;
+  color: rgb(0, 0, 0);
+  text-emphasis-position: top;
   font-size: 100px;
 }
 
 .sign-up {
   background-image: url('./images/img-7.jpg');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  color: #fff;
-  font-size: 100px;
-}
-
-.clinics {
-  background-image: url('./images/img-6.jpg');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  color: #fff;
-  font-size: 100px;
-}
-
-.exams {
-  background-image: url('./images/img-5.jpg');
-  background-position: bottom;
-  background-size: cover;
-  background-repeat: no-repeat;
-  color: #fff;
-  font-size: 100px;
-}
-
-.parameters {
-  background-image: url('./images/img-4.jpg');
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;

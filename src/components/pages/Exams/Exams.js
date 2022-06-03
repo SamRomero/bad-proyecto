@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import '../../../App.css';
+import './Exams.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
 
@@ -67,7 +68,7 @@ setExamSeleccionado(elemento);
   }
 
   return (
-    <div class="table-responsive">
+    <div class="Exams">
       <h2>Listado de Exámenes Disponibles</h2>
       <br />
       {"   "}<button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insertar</button>
