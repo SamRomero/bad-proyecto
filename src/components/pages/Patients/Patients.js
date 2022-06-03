@@ -80,7 +80,7 @@ setPatientSeleccionado(elemento);
     <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insertar</button>
     <br /><br />
 
-      <table className="table table-hover">
+      <table className="table table-bordered table-hover">
         <thead class="table-dark">
           <tr>
             <th scope="col">ID</th>

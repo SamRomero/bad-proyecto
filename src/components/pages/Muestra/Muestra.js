@@ -80,7 +80,7 @@ setMuestraSeleccionado(elemento);
     <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insertar</button>
     <br /><br />
       <table className="table table-bordered">
-        <thead>
+        <thead class="table-dark">
           <tr>
             <th>Código</th>
             <th>Descripción</th>

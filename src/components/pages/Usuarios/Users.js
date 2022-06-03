@@ -83,16 +83,16 @@ setUserSeleccionado(elemento);
       <br />
     <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insertar</button>
     <br /><br />
-      <table className="table table-bordered">
-        <thead>
+      <table className="table table-bordered table-hover">
+        <thead class="table-dark">
           <tr>
-            <th>Código</th>
-            <th>Rol</th>
-            <th>Usuario</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>DUI</th>
-            <th>Acciones</th>
+            <th scope="col">Código</th>
+            <th scope="col">Rol</th>
+            <th scope="col">Usuario</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellido</th>
+            <th scope="col">DUI</th>
+            <th scope="col">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -104,7 +104,6 @@ setUserSeleccionado(elemento);
               <td>{elemento.nombre}</td>
               <td>{elemento.apellido}</td>
               <td>{elemento.dui}</td>
-              <td>{elemento.clinica}</td>
               <td><button className="btn btn-primary" onClick={()=>seleccionarUser(elemento, 'Editar')}>Editar</button> {"   "} 
               <button className="btn btn-danger"onClick={()=>seleccionarUser(elemento, 'Eliminar')}>Eliminar</button></td>
             </tr>

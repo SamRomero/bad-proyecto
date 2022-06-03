@@ -75,7 +75,7 @@ setExamSeleccionado(elemento);
     {"   "}
     <a class="btn btn-secondary" href="/area" role="button">Areas</a>
     <br /><br />
-    <table className="table table-hover">
+    <table className="table table-bordered table-hover">
         <thead class="table-dark">
           <tr>
             <th>ID</th>

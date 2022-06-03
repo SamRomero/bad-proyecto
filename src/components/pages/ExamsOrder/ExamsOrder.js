@@ -90,7 +90,7 @@ setExamsOrderSeleccionado(elemento);
     <a class="btn btn-secondary" href="/muestra" role="button">Muestras</a>
     <br /><br />
     <table className="table table-hover table-bordered">
-        <thead class="table">
+        <thead class="table table-dark">
           <tr>
             <th>ID</th>
             <th>Usuario</th>
