@@ -76,13 +76,14 @@ setParameterSeleccionado(elemento);
       <br />
     <button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insertar</button>
     <br /><br />
-      <table className="table table-bordered">
-        <thead>
+      <table className="table table-bordered table-hover">
+        <thead class="table-dark">
           <tr>
             <th>Código</th>
             <th>Nombre</th>
             <th>Valor Inicial</th>
             <th>Valor Final</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
