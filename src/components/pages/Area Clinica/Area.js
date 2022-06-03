@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import '../../../App.css';
 import './Area.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -6,65 +6,136 @@ import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
 
 
 export default function Area() {
-    const dataAreas = [
-        { id: 1, },
-        { id: 2,  },
-        { id: 3,  },
-        { id: 4, },
-      ];
-    
-      const [data, setData] = useState(dataAreas);
-      const [modalEditar, setModalEditar] = useState(false);
-      const [modalEliminar, setModalEliminar] = useState(false);
-      const [modalInsertar, setModalInsertar] = useState(false);
-    
-      const [areaSeleccionado, setAreaeleccionado] = useState({
-        id: '',
-        nombre: ''
-      });
-    
-      const seleccionarArea=(elemento, caso)=>{
-    setAreaeleccionado(elemento);
-    (caso==='Editar')?setModalEditar(true):setModalEliminar(true)
+  function getData(){
+    let baseurl = process.env.REACT_APP_URL_BASE //url base, var de entrada en .env debe apuntar a localhosto 7008
+    const url = baseurl+"/api/AreaClinicas" //url de donde se consume, dependiendo de los cruds
+    const params = { //
+      method: 'GET', //se usa tal cual, solo se modifica el token, la cadena, dependiendo del usuario logueado.
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN
+      }, 
+    }
+    fetch(url, params).then(res => res.json()) //copiar y pegar, mapeo 
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      const dataArea =[]
+      for (let index = 0; index < response.length; index++) {
+        dataArea[index] = { //arreglo de data clinics. todos los datos que devuelve clinica
+          id : response[index].id,  // react -> api
+          nombre : response[index].nombreAreaClinica
+        }
       }
-    
-      const handleChange=e=>{
-        const {name, value}=e.target;
-        setAreaeleccionado((prevState)=>({
-          ...prevState,
-          [name]: value
-        }));
+      console.log(response) //quitar
+      setData(dataArea)
+    });
+  }
+  const [data, setData] = useState([]);
+  const [modalEditar, setModalEditar] = useState(false);
+  const [modalEliminar, setModalEliminar] = useState(false);
+  const [modalInsertar, setModalInsertar] = useState(false);
+
+  const [areaSeleccionada, setareaSeleccionada] = useState({
+    id: '',
+    nombre: ''
+  });
+
+  useEffect(()=>{ //copy and page
+    getData()
+  }, []);
+
+  const seleccionarArea=(elemento, caso)=>{
+setareaSeleccionada(elemento);
+(caso==='Editar')?setModalEditar(true):setModalEliminar(true)
+  }
+
+  const handleChange=e=>{
+    const {name, value}=e.target;
+    setareaSeleccionada((prevState)=>({
+      ...prevState,
+      [name]: value
+    }));
+  }
+
+  //eliminar
+  const eliminar=()=>{
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/AreaClinicas/"+areaSeleccionada.id //cambiar url, concatenar id
+    const params = {
+      method: 'DELETE', //metodo delete
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //cambiar token, si tira 401, significa que el token se venció.
+      } 
+    }
+    fetch(url, params).then(res => {
+      if(!res.ok){
+        const error = (data && data.message) || res.status;
+        return Promise.reject(error)
       }
-    
-      const editar=()=>{
-        var dataNueva=data;
-        dataNueva.map(area=>{
-          if(area.id===areaSeleccionado.id){
-            area.nombre=areaSeleccionado.nombre;
-          }
-        });
-        setData(dataNueva);
-        setModalEditar(false);
-      }
-    
-      const eliminar =()=>{
-        setData(data.filter(area=>area.id!==areaSeleccionado.id));
-        setModalEliminar(false);
-      }
-    
-      const abrirModalInsertar=()=>{
-        setAreaeleccionado(null);
-        setModalInsertar(true);
-      }
-    
-      const insertar =()=>{
-        var valorInsertar=areaSeleccionado;
-        valorInsertar.id=data[data.length-1].id+1;
-        var dataNueva = data;
-        dataNueva.push(valorInsertar);
-        setData(dataNueva);
-        setModalInsertar(false);
-      }
+      alert("Área Clínica eliminada con éxito")
+      getData()
+      setModalEliminar(false)
+    })
+    .catch(error =>{ 
+      alert("La Área no es candidata a eliminación")
+      setModalEliminar(false)
+    });
+  }
+
+  //EDITAR
+  const editar =()=>{
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/AreaClinicas/"+areaSeleccionada.id //no tocar nada, mas que url y el id
+    const params = {
+      method: 'PUT',
+      headers:{
+        'accept': '*/*',
+        'content-type':'application/json', //esto es pa editar.
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //modificar key
+      }, 
+      body:JSON.stringify({ //depende de los campos.
+        id : areaSeleccionada.id,
+        nombreAreaClinica : areaSeleccionada.nombre //api -> front
+      })
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      //console.log(response)
+      getData()
+      setModalEditar(false)
+    });
+  }
+
+  const abrirModalInsertar=()=>{
+    setareaSeleccionada(null);
+    setModalInsertar(true);
+  }
+
+  //insertar
+  const insertar =()=>{
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/AreaClinicas" //modificar url
+    const params = {
+      method: 'POST', //metodo post
+      headers:{
+        'accept': '*/*',
+        'content-type':'application/json', //json
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //modificar key
+      }, 
+      body:JSON.stringify({ //api -> front
+        nombreAreaClinica : areaSeleccionada.nombre
+      })
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      console.log(response)
+      getData()
+      setModalInsertar(false)
+    });
+  }
     
       return (
         <div class="Area">
@@ -107,7 +178,7 @@ export default function Area() {
                   readOnly
                   type="text"
                   name="id"
-                  value={areaSeleccionado && areaSeleccionado.id}
+                  value={areaSeleccionada && areaSeleccionada.id}
                 />
                 <br />
     
@@ -115,8 +186,8 @@ export default function Area() {
                 <input
                   className="form-control"
                   type="text"
-                  name="area"
-                  value={areaSeleccionado && areaSeleccionado.area}
+                  name="nombre"
+                  value={areaSeleccionada && areaSeleccionada.nombre}
                   onChange={handleChange}
                 />
                 <br />
@@ -140,7 +211,7 @@ export default function Area() {
     
           <Modal isOpen={modalEliminar}>
             <ModalBody>
-              Estás Seguro que deseas eliminar el registro {areaSeleccionado && areaSeleccionado.nombre}
+              Estás Seguro que deseas eliminar el registro {areaSeleccionada && areaSeleccionada.nombre}
             </ModalBody>
             <ModalFooter>
               <button className="btn btn-danger" onClick={()=>eliminar()}>
@@ -164,22 +235,12 @@ export default function Area() {
             </ModalHeader>
             <ModalBody>
               <div className="form-group">
-                <label>ID</label>
-                <input
-                  className="form-control"
-                  readOnly
-                  type="text"
-                  name="id"
-                  value={data[data.length-1].id+1}
-                />
-                <br />
-    
                 <label>Área</label>
                 <input
                   className="form-control"
                   type="text"
-                  name="area"
-                  value={areaSeleccionado ? areaSeleccionado.area: ''}
+                  name="nombre"
+                  value={areaSeleccionada ? areaSeleccionada.nombre: ''}
                   onChange={handleChange}
                 />
                 <br />
