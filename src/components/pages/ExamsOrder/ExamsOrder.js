@@ -1,18 +1,42 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import '../../../App.css';
 import './ExamsOrder.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
 
 export default function ExamsOrder() {
-  const dataExamsOrder = [
-    { id: 1, },
-    { id: 2,  },
-    { id: 3,  },
-    { id: 4, },
-  ];
 
-  const [data, setData] = useState(dataExamsOrder);
+  function getData(){
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/OrdenExamen/"
+    const params = {
+      method: 'GET',
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+process.env.REACT_APP_TOKEN
+      }, 
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+
+      const dataExamsOrder =[]
+      
+      for (let index = 0; index < response.length; index++) {
+        dataExamsOrder[index] = {
+          id : response[index].id, 
+          usuario : response[index].usuarioId, 
+          clinica : response[index].clinicaId,
+          paciente : response[index].pacienteId,
+          examenes : response[index].examenes,
+        }
+      }
+      console.log(dataExamsOrder)
+      setData(dataExamsOrder)
+    });
+  }
+
+  const [data, setData] = useState([]);
   const [modalEditar, setModalEditar] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
   const [modalInsertar, setModalInsertar] = useState(false);
@@ -22,13 +46,13 @@ export default function ExamsOrder() {
     usuario: '',
     clinica: '',
     paciente: '',
-    usu_usuario: '',
-    fecha_de_solicitud: '',
-    entrega: '',
-    muestra: '',
-    estado: '',
+    examenes: '',
   });
 
+    useEffect(()=>{
+    getData()
+  }, []);
+  
   const seleccionarExamsOrder=(elemento, caso)=>{
 setExamsOrderSeleccionado(elemento);
 (caso==='Editar')?setModalEditar(true):setModalEliminar(true)
@@ -42,27 +66,29 @@ setExamsOrderSeleccionado(elemento);
     }));
   }
 
-  const editar=()=>{
-    var dataNueva=data;
-    dataNueva.map(examsOrder=>{
-      if(examsOrder.id===examsOrderSeleccionado.id){
-        examsOrder.usuario=examsOrderSeleccionado.usuario;
-        examsOrder.clinica=examsOrderSeleccionado.clinica;
-        examsOrder.paciente=examsOrderSeleccionado.paciente;
-        examsOrder.usu_usuario=examsOrderSeleccionado.usuario;
-        examsOrder.fecha_de_solicitud=examsOrderSeleccionado.fecha_de_solicitud;
-        examsOrder.entrega=examsOrderSeleccionado.entrega;
-        examsOrder.muestra=examsOrderSeleccionado.muestra;
-        examsOrder.estado=examsOrderSeleccionado.estado;
-      }
-    });
-    setData(dataNueva);
-    setModalEditar(false);
-  }
-
   const eliminar =()=>{
-    setData(data.filter(examsOrder=>examsOrder.id!==examsOrderSeleccionado.id));
-    setModalEliminar(false);
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/OrdenExamen/"+examsOrderSeleccionado.id
+    const params = {
+      method: 'DELETE',
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+process.env.REACT_APP_TOKEN
+      } 
+    }
+    fetch(url, params).then(res => {
+      if(!res.ok){
+        const error = (data && data.message) || res.status;
+        return Promise.reject(error)
+      }
+      alert("Orden de Exámen eliminado con exito")
+      getData()
+      setModalEliminar(false)
+    })
+    .catch(error =>{ 
+      alert("La Orden de Exámen no es candidato a eliminacion")
+      setModalEliminar(false)
+    });
   }
 
   const abrirModalInsertar=()=>{
@@ -71,12 +97,30 @@ setExamsOrderSeleccionado(elemento);
   }
 
   const insertar =()=>{
-    var valorInsertar=examsOrderSeleccionado;
-    valorInsertar.id=data[data.length-1].id+1;
-    var dataNueva = data;
-    dataNueva.push(valorInsertar);
-    setData(dataNueva);
-    setModalInsertar(false);
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/OrdenExamen"
+    const params = {
+      method: 'POST',
+      headers:{
+        'accept': '*/*',
+        'content-type':'application/json',
+        'Authorization': 'Bearer '+process.env.REACT_APP_TOKEN
+      }, 
+      body:JSON.stringify({
+        id : examsOrderSeleccionado.id,
+        usuarioId : examsOrderSeleccionado.usuario,
+        clinicaId :parseInt(examsOrderSeleccionado.clinica),
+        pacienteId : parseInt(examsOrderSeleccionado.paciente),
+        examenes : [{ id: parseInt(examsOrderSeleccionado.examenes)}],
+      })
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      console.log(response)
+      getData()
+      setModalInsertar(false)
+    });
   }
 
   return (
@@ -96,12 +140,6 @@ setExamsOrderSeleccionado(elemento);
             <th>Usuario</th>
             <th>Clinica</th>
             <th>Paciente</th>
-            <th>Usu Usuario</th>
-            <th>Fecha de Solicitud</th>
-            <th>Entrega</th>
-            <th>Muestra</th>
-            <th>Estado</th>
-            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -111,13 +149,6 @@ setExamsOrderSeleccionado(elemento);
               <td>{elemento.usuario}</td>
               <td>{elemento.clinica}</td>
               <td>{elemento.paciente}</td>
-              <td>{elemento.usu_usuario}</td>
-              <td>{elemento.fecha_de_solicitud}</td>
-              <td>{elemento.entrega}</td>
-              <td>{elemento.muestra}</td>
-              <td>{elemento.estado}</td>
-              <td><button className="btn btn-primary" onClick={()=>seleccionarExamsOrder(elemento, 'Editar')}>Editar</button> {"   "} 
-              <button className="btn btn-danger" onClick={()=>seleccionarExamsOrder(elemento, 'Eliminar')}>Eliminar</button></td>
             </tr>
           ))
           }
@@ -132,16 +163,6 @@ setExamsOrderSeleccionado(elemento);
         </ModalHeader>
         <ModalBody>
           <div className="form-group">
-            <label>ID</label>
-            <input
-              className="form-control"
-              readOnly
-              type="text"
-              name="id"
-              value={examsOrderSeleccionado && examsOrderSeleccionado.id}
-            />
-            <br />
-
             <label>Usuario</label>
             <input
               className="form-control"
@@ -172,52 +193,12 @@ setExamsOrderSeleccionado(elemento);
             />
             <br />
 
-            <label>Usu Usuario</label>
+            <label>Exámenes</label>
             <input
               className="form-control"
               type="text"
-              name="usu_usuario"
+              name="examenes"
               value={examsOrderSeleccionado ? examsOrderSeleccionado.usu_usuario: ''}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Fecha de Solicitud</label>
-            <input
-              className="form-control"
-              type="text"
-              name="fecha_de_solicitud"
-              value={examsOrderSeleccionado ? examsOrderSeleccionado.fecha_de_solicitud: ''}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Entrega</label>
-            <input
-              className="form-control"
-              type="text"
-              name="entrega"
-              value={examsOrderSeleccionado ? examsOrderSeleccionado.entrega: ''}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Muestra</label>
-            <input
-              className="form-control"
-              type="text"
-              name="muestra"
-              value={examsOrderSeleccionado ? examsOrderSeleccionado.muestra: ''}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Estado</label>
-            <input
-              className="form-control"
-              type="text"
-              name="estado"
-              value={examsOrderSeleccionado ? examsOrderSeleccionado.estado: ''}
               onChange={handleChange}
             />
             <br />
@@ -226,7 +207,7 @@ setExamsOrderSeleccionado(elemento);
 
     
         <ModalFooter>
-          <button className="btn btn-primary" onClick={()=>editar()}>
+          <button className="btn btn-primary">
             Actualizar
           </button>
           <button
@@ -265,16 +246,6 @@ setExamsOrderSeleccionado(elemento);
         </ModalHeader>
         <ModalBody>
           <div className="form-group">
-            <label>ID</label>
-            <input
-              className="form-control"
-              readOnly
-              type="text"
-              name="id"
-              value={data[data.length-1].id+1}
-            />
-            <br />
-
             <label>Usuario</label>
             <input
               className="form-control"
@@ -305,52 +276,12 @@ setExamsOrderSeleccionado(elemento);
             />
             <br />
 
-            <label>Usu Usuario</label>
+            <label>Exámenes</label>
             <input
               className="form-control"
               type="text"
-              name="usu_usuario"
-              value={examsOrderSeleccionado ? examsOrderSeleccionado.usu_usuario: ''}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Fecha de Solicitud</label>
-            <input
-              className="form-control"
-              type="text"
-              name="fecha_de_solicitud"
-              value={examsOrderSeleccionado ? examsOrderSeleccionado.fecha_de_solicitud: ''}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Entrega</label>
-            <input
-              className="form-control"
-              type="text"
-              name="entrega"
-              value={examsOrderSeleccionado ? examsOrderSeleccionado.entrega: ''}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Muestra</label>
-            <input
-              className="form-control"
-              type="text"
-              name="muestra"
-              value={examsOrderSeleccionado ? examsOrderSeleccionado.muestra: ''}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Estado</label>
-            <input
-              className="form-control"
-              type="text"
-              name="estado"
-              value={examsOrderSeleccionado ? examsOrderSeleccionado.estado: ''}
+              name="examenes"
+              value={examsOrderSeleccionado ? examsOrderSeleccionado.examenes: ''}
               onChange={handleChange}
             />
             <br />

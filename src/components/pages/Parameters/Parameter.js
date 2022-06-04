@@ -1,18 +1,38 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import '../../../App.css';
 import '../Usuarios/Users.css';
 import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
 
 export default function Parameter() {
-    const dataParameters = [
-    { id: 1,},
-    { id: 2,},
-    { id: 3,},
-    { id: 4,},
-    { id: 5,}
-  ];
 
-  const [data, setData] = useState(dataParameters);
+  function getData(){
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/Parametros"
+    const params = {
+      method: 'GET',
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+process.env.REACT_APP_TOKEN
+      }, 
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+
+      const dataParameters =[]
+      
+      for (let index = 0; index < response.length; index++) {
+        dataParameters[index] = {
+          id : response[index].id, 
+          nombre : response[index].nombreParametro, 
+        }
+      }
+      console.log(dataParameters)
+      setData(dataParameters)
+    });
+  }
+
+  const [data, setData] = useState([]);
   const [modalEditar, setModalEditar] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
   const [modalInsertar, setModalInsertar] = useState(false);
@@ -20,9 +40,11 @@ export default function Parameter() {
   const [parameterSeleccionado, setParameterSeleccionado] = useState({
     id: '',
     nombre: '',
-    valor_inicial: '',
-    valor_final: '',
   });
+
+  useEffect(()=>{
+    getData()
+  }, []);
 
   const seleccionarParameter=(elemento, caso)=>{
 setParameterSeleccionado(elemento);
@@ -38,22 +60,52 @@ setParameterSeleccionado(elemento);
   }
 
   const editar=()=>{
-    var dataNueva=data;
-    dataNueva.map(parameter=>{
-      if(parameter.id===parameterSeleccionado.id){
-        parameter.nombre=parameterSeleccionado.nombre;
-        parameter.valor_inicial=parameterSeleccionado.valor_inicial;
-        parameter.valor_final=parameterSeleccionado.valor_final;
-;
-      }
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/Parametros/"+parameterSeleccionado.id //no tocar nada, mas que url y el id
+    const params = {
+      method: 'PUT',
+      headers:{
+        'accept': '*/*',
+        'content-type':'application/json', //esto es pa editar.
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //modificar key
+      }, 
+      body:JSON.stringify({ //depende de los campos.
+        id : parameterSeleccionado.id,
+        nombreParametro : parameterSeleccionado.nombre, //api -> front
+      })
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      //console.log(response)
+      getData()
+      setModalEditar(false)
     });
-    setData(dataNueva);
-    setModalEditar(false);
   }
 
   const eliminar =()=>{
-    setData(data.filter(parameter=>parameter.id!==parameterSeleccionado.id));
-    setModalEliminar(false);
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/Parametros/"+parameterSeleccionado.id //cambiar url, concatenar id
+    const params = {
+      method: 'DELETE', //metodo delete
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+process.env.REACT_APP_TOKEN //cambiar token, si tira 401, significa que el token se venció.
+      } 
+    }
+    fetch(url, params).then(res => {
+      if(!res.ok){
+        const error = (data && data.message) || res.status;
+        return Promise.reject(error)
+      }
+      alert("Parámetro eliminada con exito")
+      getData()
+      setModalEliminar(false)
+    })
+    .catch(error =>{ 
+      alert("El parámetro no es candidato a eliminacion")
+      setModalEliminar(false)
+    });
   }
 
   const abrirModalInsertar=()=>{
@@ -62,12 +114,27 @@ setParameterSeleccionado(elemento);
   }
 
   const insertar =()=>{
-    var valorInsertar=parameterSeleccionado;
-    valorInsertar.id=data[data.length-1].id+1;
-    var dataNueva = data;
-    dataNueva.push(valorInsertar);
-    setData(dataNueva);
-    setModalInsertar(false);
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/Parametros"
+    const params = {
+      method: 'POST',
+      headers:{
+        'accept': '*/*',
+        'content-type':'application/json',
+        'Authorization': 'Bearer '+process.env.REACT_APP_TOKEN
+      }, 
+      body:JSON.stringify({
+        id : parameterSeleccionado.id,
+        nombreParametro : parameterSeleccionado.nombre,
+      })
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      console.log(response)
+      getData()
+      setModalInsertar(false)
+    });
   }
 
   return (
@@ -81,8 +148,6 @@ setParameterSeleccionado(elemento);
           <tr>
             <th>Código</th>
             <th>Nombre</th>
-            <th>Valor Inicial</th>
-            <th>Valor Final</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -91,8 +156,6 @@ setParameterSeleccionado(elemento);
             <tr>
               <td>{elemento.id}</td>
               <td>{elemento.nombre}</td>
-              <td>{elemento.valor_inicial}</td>
-              <td>{elemento.valor_final}</td>
               <td><button className="btn btn-primary" onClick={()=>seleccionarParameter(elemento, 'Editar')}>Editar</button> {"   "} 
               <button className="btn btn-danger"onClick={()=>seleccionarParameter(elemento, 'Eliminar')}>Eliminar</button></td>
             </tr>
@@ -109,42 +172,12 @@ setParameterSeleccionado(elemento);
         </ModalHeader>
         <ModalBody>
           <div className="form-group">
-            <label>ID</label>
-            <input
-              className="form-control"
-              readOnly
-              type="text"
-              name="id"
-              value={parameterSeleccionado && parameterSeleccionado.id}
-            />
-            <br />
-
             <label>Nombre</label>
             <input
               className="form-control"
               type="text"
               name="nombre"
               value={parameterSeleccionado ? parameterSeleccionado.nombre: ''}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Valor Inicial</label>
-            <input
-              className="form-control"
-              type="text"
-              name="valor_inicial"
-              value={parameterSeleccionado ? parameterSeleccionado.valor_inicial: ''}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Valor Final</label>
-            <input
-              className="form-control"
-              type="text"
-              name="valor_final"
-              value={parameterSeleccionado ? parameterSeleccionado.valor_final: ''}
               onChange={handleChange}
             />
             <br />
@@ -190,42 +223,12 @@ setParameterSeleccionado(elemento);
         </ModalHeader>
         <ModalBody>
           <div className="form-group">
-            <label>ID</label>
-            <input
-              className="form-control"
-              readOnly
-              type="text"
-              name="id"
-              value={data[data.length-1].id+1}
-            />
-            <br />
-
             <label>Nombre</label>
             <input
               className="form-control"
               type="text"
               name="nombre"
               value={parameterSeleccionado ? parameterSeleccionado.nombre: ''}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Valor Inicial</label>
-            <input
-              className="form-control"
-              type="text"
-              name="valor_inicial"
-              value={parameterSeleccionado ? parameterSeleccionado.valor_inicial: ''}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Valor Final</label>
-            <input
-              className="form-control"
-              type="text"
-              name="valor_final"
-              value={parameterSeleccionado ? parameterSeleccionado.valor_final: ''}
               onChange={handleChange}
             />
             <br />

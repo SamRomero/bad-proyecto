@@ -143,6 +143,8 @@ setExamSeleccionado(elemento);
       {"   "}<button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insertar</button>
     {"   "}
     <a class="btn btn-secondary" href="/area" role="button">Areas</a>
+    {"   "}
+    <a class="btn btn-secondary" href="/parameters" role="button">Parametros</a>
     <br /><br />
     <table className="table table-bordered table-hover">
         <thead class="table-dark">
