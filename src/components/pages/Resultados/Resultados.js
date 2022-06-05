@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react'; //useEffect paa la tablas
 import '../../../App.css';
 import './Resultados.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -6,68 +6,148 @@ import {Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap';
 
 
 export default function Resultados() {
-    const dataResultados = [
-        { id: 1, },
-        { id: 2,  },
-        { id: 3,  },
-        { id: 4, },
-      ];
-    
-      const [data, setData] = useState(dataResultados);
-      const [modalEditar, setModalEditar] = useState(false);
-      const [modalEliminar, setModalEliminar] = useState(false);
-      const [modalInsertar, setModalInsertar] = useState(false);
-    
-      const [resultadoSeleccionado, setresultadoSeleccionado] = useState({
-        id: '',
-        nombre: '',
-        area: ''
-      });
-    
-      const seleccionarResultado=(elemento, caso)=>{
-    setresultadoSeleccionado(elemento);
-    (caso==='Editar')?setModalEditar(true):setModalEliminar(true)
+  function getData(){
+    let baseurl = process.env.REACT_APP_URL_BASE //url base, var de entrada en .env debe apuntar a localhosto 7008
+    const url = baseurl+"/api/ResultadoExamen" //url de donde se consume, dependiendo de los cruds
+    const params = { //
+      method: 'GET', //se usa tal cual, solo se modifica el token, la cadena, dependiendo del usuario logueado.
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN
+      }, 
+    }
+    fetch(url, params).then(res => res.json()) //copiar y pegar, mapeo 
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      const dataResultado =[]
+      for (let index = 0; index < response.length; index++) {
+        dataResultado[index] = { //arreglo de data clinics. todos los datos que devuelve clinica
+          id : response[index].id,  // react -> api
+          orden : response[index].ordenExamenId, 
+          tipo : response[index].tipoExamenId, 
+          parametro : response[index].parametroId, 
+          valor : response[index].valor 
+        }
       }
-    
-      const handleChange=e=>{
-        const {name, value}=e.target;
-        setresultadoSeleccionado((prevState)=>({
-          ...prevState,
-          [name]: value
-        }));
+      console.log(dataResultado) //quitar
+      setData(dataResultado)
+    });
+  }
+  const [data, setData] = useState([]);
+  const [modalEditar, setModalEditar] = useState(false);
+  const [modalEliminar, setModalEliminar] = useState(false);
+  const [modalInsertar, setModalInsertar] = useState(false);
+
+  const [resultadoSeleccionado, setResultadoSeleccionado] = useState({
+    id: '',
+    orden: '',
+    tipo: '',
+    parametro: '',
+    valor: ''
+  });
+
+  useEffect(()=>{ //copy and page
+    getData()
+  }, []);
+
+  const seleccionarResultado=(elemento, caso)=>{
+setResultadoSeleccionado(elemento);
+(caso==='Editar')?setModalEditar(true):setModalEliminar(true)
+  }
+
+  const handleChange=e=>{
+    const {name, value}=e.target;
+    setResultadoSeleccionado((prevState)=>({
+      ...prevState,
+      [name]: value
+    }));
+  }
+
+  //
+  const eliminar=()=>{
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/ResultadoExamen"+resultadoSeleccionado.id //cambiar url, concatenar id
+    const params = {
+      method: 'DELETE', //metodo delete
+      headers:{
+        'accept': '*/*',
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //cambiar token, si tira 401, significa que el token se venció.
+      } 
+    }
+    fetch(url, params).then(res => {
+      if(!res.ok){
+        const error = (data && data.message) || res.status;
+        return Promise.reject(error)
       }
-    
-      const editar=()=>{
-        var dataNueva=data;
-        dataNueva.map(resultado=>{
-          if(resultado.id===resultadoSeleccionado.id){
-            resultado.orden=resultadoSeleccionado.orden;
-            resultado.parametro=resultadoSeleccionado.parametro;
-            resultado.valor=resultadoSeleccionado.valor;
-          }
-        });
-        setData(dataNueva);
-        setModalEditar(false);
-      }
-    
-      const eliminar =()=>{
-        setData(data.filter(resultado=>resultado.id!==resultadoSeleccionado.id));
-        setModalEliminar(false);
-      }
-    
-      const abrirModalInsertar=()=>{
-        setresultadoSeleccionado(null);
-        setModalInsertar(true);
-      }
-    
-      const insertar =()=>{
-        var valorInsertar=resultadoSeleccionado;
-        valorInsertar.id=data[data.length-1].id+1;
-        var dataNueva = data;
-        dataNueva.push(valorInsertar);
-        setData(dataNueva);
-        setModalInsertar(false);
-      }
+      alert("Resultado eliminado con exito")
+      getData()
+      setModalEliminar(false)
+    })
+    .catch(error =>{ 
+      alert("El resultado no es candidato a eliminacion")
+      setModalEliminar(false)
+    });
+  }
+
+  //EDITAR
+  const editar =()=>{
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/ResultadoExamen"+resultadoSeleccionado.id //no tocar nada, mas que url y el id
+    const params = {
+      method: 'PUT',
+      headers:{
+        'accept': '*/*',
+        'content-type':'application/json', //esto es pa editar.
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //modificar key
+      }, 
+      body:JSON.stringify({ //depende de los campos.
+        id : resultadoSeleccionado.id,
+        ordenExamenId :  parseInt(resultadoSeleccionado.orden), //api -> front
+        tipoExamenId :  parseInt(resultadoSeleccionado.tipo),
+        parametroId : parseInt(resultadoSeleccionado.parametro),
+        valor : parseInt(resultadoSeleccionado.valor) //todos los id hay que parsearlos a enteros.
+      })
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      //console.log(response)
+      getData()
+      setModalEditar(false)
+    });
+  }
+
+  const abrirModalInsertar=()=>{
+    setResultadoSeleccionado(null);
+    setModalInsertar(true);
+  }
+
+  //insertar
+  const insertar =()=>{
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/ResultadoExamen" //modificar url
+    const params = {
+      method: 'POST', //metodo post
+      headers:{
+        'accept': '*/*',
+        'content-type':'application/json', //json
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //modificar key
+      }, 
+      body:JSON.stringify({ //api -> front     
+        ordenExamenId :  parseInt(resultadoSeleccionado.orden), //api -> front
+        tipoExamenId :  parseInt(resultadoSeleccionado.tipo),
+        parametroId : parseInt(resultadoSeleccionado.parametro),
+        valor : parseInt(resultadoSeleccionado.valor) //todos los id hay que parsearlos a enteros.
+      })
+    }
+    fetch(url, params).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => {
+      console.log(response)
+      getData()
+      setModalInsertar(false)
+    });
+  }
     
       return (
         <div class="Resultados">
@@ -80,8 +160,8 @@ export default function Resultados() {
               <tr>
                 <th>ID</th>
                 <th>Orden</th>
+                <th>Tipo</th>
                 <th>Parametro</th>
-                <th>Orden</th>
                 <th>Valor</th>
                 <th>Acciones</th>
               </tr>
@@ -90,9 +170,9 @@ export default function Resultados() {
               {data.map(elemento=>(
                 <tr>
                   <td>{elemento.id}</td>
-                  <td>{elemento.nombre}</td>
-                  <td>{elemento.parametro}</td>
                   <td>{elemento.orden}</td>
+                  <td>{elemento.tipo}</td>
+                  <td>{elemento.parametro}</td>
                   <td>{elemento.valor}</td>
                   <td><button className="btn btn-primary" onClick={()=>seleccionarResultado(elemento, 'Editar')}>Editar</button> {"   "} 
                   <button className="btn btn-danger" onClick={()=>seleccionarResultado(elemento, 'Eliminar')}>Eliminar</button></td>
@@ -125,7 +205,17 @@ export default function Resultados() {
                   className="form-control"
                   type="text"
                   name="orden"
-                  value={resultadoSeleccionado && resultadoSeleccionado.nombre}
+                  value={resultadoSeleccionado && resultadoSeleccionado.orden}
+                  onChange={handleChange}
+                />
+                <br />
+    
+                <label>Tipo Examen</label>
+                <input
+                  className="form-control"
+                  type="text"
+                  name="tipo"
+                  value={resultadoSeleccionado && resultadoSeleccionado.tipo}
                   onChange={handleChange}
                 />
                 <br />
@@ -135,17 +225,17 @@ export default function Resultados() {
                   className="form-control"
                   type="text"
                   name="parametro"
-                  value={resultadoSeleccionado && resultadoSeleccionado.area}
+                  value={resultadoSeleccionado && resultadoSeleccionado.parametro}
                   onChange={handleChange}
                 />
                 <br />
-    
+
                 <label>Valor</label>
                 <input
                   className="form-control"
                   type="text"
                   name="valor"
-                  value={resultadoSeleccionado && resultadoSeleccionado.area}
+                  value={resultadoSeleccionado && resultadoSeleccionado.valor}
                   onChange={handleChange}
                 />
                 <br />
@@ -193,22 +283,22 @@ export default function Resultados() {
             </ModalHeader>
             <ModalBody>
               <div className="form-group">
-                <label>ID</label>
-                <input
-                  className="form-control"
-                  readOnly
-                  type="text"
-                  name="id"
-                  value={data[data.length-1].id+1}
-                />
-                <br />
-    
-                <label>Orden</label>
+              <label>Orden</label>
                 <input
                   className="form-control"
                   type="text"
                   name="orden"
-                  value={resultadoSeleccionado ? resultadoSeleccionado.nombre: ''}
+                  value={resultadoSeleccionado && resultadoSeleccionado.orden}
+                  onChange={handleChange}
+                />
+                <br />
+    
+                <label>Tipo Examen</label>
+                <input
+                  className="form-control"
+                  type="text"
+                  name="tipo"
+                  value={resultadoSeleccionado && resultadoSeleccionado.tipo}
                   onChange={handleChange}
                 />
                 <br />
@@ -218,20 +308,20 @@ export default function Resultados() {
                   className="form-control"
                   type="text"
                   name="parametro"
-                  value={resultadoSeleccionado ? resultadoSeleccionado.area: ''}
+                  value={resultadoSeleccionado && resultadoSeleccionado.parametro}
                   onChange={handleChange}
                 />
                 <br />
-    
+
                 <label>Valor</label>
                 <input
-                className="form-control"
-                type="text"
-                name="valor"
-                value={resultadoSeleccionado ? resultadoSeleccionado.area: ''}
-                onChange={handleChange}
+                  className="form-control"
+                  type="text"
+                  name="valor"
+                  value={resultadoSeleccionado && resultadoSeleccionado.valor}
+                  onChange={handleChange}
                 />
-                <br />  
+                <br />
   
               </div>
             </ModalBody>

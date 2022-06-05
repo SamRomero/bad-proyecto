@@ -24,7 +24,7 @@ export default function Exams() {
           id : response[index].id,  // react -> api
           nombre : response[index].nombreTipoExamen,
           area : response[index].areaClinicaId,
-          paramametros : response[index].parametros
+          //paramametros : response[index].parametros
         }
       }
       console.log(response) //quitar
@@ -35,10 +35,12 @@ export default function Exams() {
   const [modalEditar, setModalEditar] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
   const [modalInsertar, setModalInsertar] = useState(false);
+  const [modalInsertarParam, setModalInsertarParam] = useState(false);
 
   const [examSeleccionado, setExamSeleccionado] = useState({
     id: '',
-    nombre: ''
+    nombre: '',
+    paramametroId: ''
   });
 
   useEffect(()=>{ //copy and page
@@ -57,7 +59,24 @@ setExamSeleccionado(elemento);
       [name]: value
     }));
   }
-
+/*
+  //Agregar parametro
+  const agregarParametro =()=>{
+    let baseurl = process.env.REACT_APP_URL_BASE
+    const url = baseurl+"/api/TipoExamen/setParams?idExamen="+examSeleccionado.id
+    const params = {
+      method: 'POST',
+      headers: {
+        'accept': '* /*',
+        'content-type':'application/json', //esto es pa editar.
+        'Authorization': 'Bearer '+ process.env.REACT_APP_TOKEN //modificar key
+      }, 
+      body:JSON.stringify([{
+        id : examSeleccionado.paramametroId
+      }])
+    }
+  */
+  
 
   //EDITAR
   const editar =()=>{
@@ -74,7 +93,7 @@ setExamSeleccionado(elemento);
         id : examSeleccionado.id,
         nombreTipoExamen : examSeleccionado.nombre,
         areaClinicaId : parseInt(examSeleccionado.area) ,
-        paramametros : examSeleccionado.parametros
+        //paramametros : examSeleccionado.parametros
       })
     }
     fetch(url, params).then(res => res.json())
@@ -104,8 +123,8 @@ setExamSeleccionado(elemento);
       }, 
       body:JSON.stringify({ //api -> front
         nombreTipoExamen : examSeleccionado.nombre,
-        areaClinicaId : parseInt(examSeleccionado.area) ,
-        paramametros : examSeleccionado.parametros
+        areaClinicaId : parseInt(examSeleccionado.area) 
+        //paramametros : examSeleccionado.parametros
       })
     }
     fetch(url, params).then(res => res.json())
@@ -124,6 +143,8 @@ setExamSeleccionado(elemento);
       {"   "}<button className="btn btn-success" onClick={()=>abrirModalInsertar()}>Insertar</button>
     {"   "}
     <a class="btn btn-secondary" href="/area" role="button">Areas</a>
+    {"   "}
+    <a class="btn btn-secondary" href="/parameters" role="button">Parametros</a>
     <br /><br />
     <table className="table table-bordered table-hover">
         <thead class="table-dark">
@@ -131,7 +152,6 @@ setExamSeleccionado(elemento);
             <th>ID</th>
             <th>Nombre</th>
             <th>Área</th>
-            <th>Parametros</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -141,8 +161,8 @@ setExamSeleccionado(elemento);
               <td>{elemento.id}</td>
               <td>{elemento.nombre}</td>
               <td>{elemento.area}</td>
-              <td>{elemento.paramametros}</td>
-              <td><button className="btn btn-primary" onClick={()=>seleccionarExam(elemento, 'Editar')}>Editar</button></td>
+              <td><button className="btn btn-primary" onClick={()=>seleccionarExam(elemento, 'Editar')}>Editar</button> {"   "}
+              <button className="btn btn-secondary" onClick={()=>seleccionarExam(elemento, 'Editar')}>Agregar Parametro</button></td>
             </tr>
           ))
           }
